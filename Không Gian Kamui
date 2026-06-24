@@ -1,0 +1,535 @@
+Khu vực kamui rộng hơn và to hơn màu đen V2
+id                           6164248822
+Position id           104, -349, -571
+
+
+
+
+
+
+
+nếu bị respawn (die) thì sẽ mất nút button và model
+-- NGƯỜI CHƠI & CÔNG CỤ
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- GIAO DIỆN (UI)
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Position = UDim2.new(0, 10, 0.5, -25)
+button.Size = UDim2.new(0, 200, 0, 50)
+button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+button.Text = "Kamui Dimension"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 20
+
+-- CÀI ĐẶT
+local MODEL_ID = 6164248822                                                      -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(104, -349, -571)            -- Vị trí teleport (X, Y, Z)
+
+-- TRẠNG THÁI
+local model = nil
+local savedCFrame = nil
+local teleported = false
+local debounce = false
+
+-- LẤY NHÂN VẬT
+local function getCharacter()
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	return char, hrp
+end
+
+-- DỊCH CHUYỂN
+local function teleport(cf)
+	local _, hrp = getCharacter()
+
+	hrp.AssemblyLinearVelocity = Vector3.zero
+	hrp.AssemblyAngularVelocity = Vector3.zero
+	hrp.CFrame = cf
+end
+
+-- TẢI MODEL
+local function loadModel()
+	local success, result = pcall(function()
+		return game:GetObjects("rbxassetid://" .. MODEL_ID)
+	end)
+
+	if success and result and result[1] then
+		local m = result[1]
+		m.Parent = workspace
+		return m
+	end
+
+	warn("Không load được model")
+	return nil
+end
+
+model = loadModel()
+
+-- NÚT LOGIC
+button.MouseButton1Click:Connect(function()
+	if debounce then return end
+	debounce = true
+
+	local _, hrp = getCharacter()
+
+	if not teleported then
+		-- Lần 1: lưu vị trí + teleport tới điểm mục tiêu
+		savedCFrame = hrp.CFrame
+		teleport(TARGET_CFRAME)
+		teleported = true
+	else
+		-- Lần 2: quay lại vị trí cũ
+		if savedCFrame then
+			teleport(savedCFrame)
+		end
+		teleported = false
+	end
+
+	task.wait(0.2)
+	debounce = false
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+nếu bị respawn (die) thì sẽ không có mất nút button và model
+-- NGƯỜI CHƠI & CÔNG CỤ
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- GIAO DIỆN (UI)
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Name = "MyTeleportUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Position = UDim2.new(0, 10, 0.5, -25)
+button.Size = UDim2.new(0, 200, 0, 50)
+button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+button.Text = "Kamui Dimension"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 20
+
+-- CÀI ĐẶT
+local MODEL_ID = 6164248822                                                      -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(104, -349, -571)            -- Vị trí teleport (X, Y, Z)
+
+-- TRẠNG THÁI
+local model = nil
+local savedCFrame = nil
+local teleported = false
+local debounce = false
+local alive = true
+
+-- LẤY NHÂN VẬT
+local function getCharacter()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    return char, hrp
+end
+
+-- DỊCH CHUYỂN
+local function teleport(cf)
+    local _, hrp = getCharacter()
+
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    hrp.AssemblyAngularVelocity = Vector3.zero
+    hrp.CFrame = cf
+end
+
+-- TẢI MODEL
+local function loadModel()
+    local success, result = pcall(function()
+        return game:GetObjects("rbxassetid://" .. MODEL_ID)
+    end)
+
+    if success and result and result[1] then
+        local m = result[1]
+        m.Parent = workspace
+        return m
+    end
+
+    warn("Không load được model")
+    return nil
+end
+
+model = loadModel()
+
+-- NÚT LOGIC
+button.MouseButton1Click:Connect(function()
+    if debounce or not alive then return end
+    debounce = true
+
+    local _, hrp = getCharacter()
+
+    if not teleported then
+        savedCFrame = hrp.CFrame
+        teleport(TARGET_CFRAME)
+        teleported = true
+    else
+        if savedCFrame then
+            teleport(savedCFrame)
+        end
+        teleported = false
+    end
+
+    task.wait(0.2)
+    debounce = false
+end)
+
+-- DỌN DẸP
+local function cleanup()
+    alive = false
+
+    if screenGui then
+        screenGui:Destroy()
+    end
+
+    if model then
+        model:Destroy()
+        model = nil
+    end
+end
+
+-- MÓC NHÂN VẬT
+local function hookCharacter(char)
+    local humanoid = char:WaitForChild("Humanoid")
+
+    humanoid.Died:Connect(function()
+        cleanup()
+    end)
+end
+
+-- KÝ TỰ KHỞI TẠO
+if player.Character then
+    hookCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(function(char)
+    if not alive then return end
+    hookCharacter(char)
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Khu vực kamui trong blox fruit
+Id                           424233726
+Position id          -1916, -310, -1722
+
+
+
+
+
+
+
+nếu bị respawn (die) thì sẽ mất nút button và model
+-- NGƯỜI CHƠI & CÔNG CỤ
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- GIAO DIỆN (UI)
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Position = UDim2.new(0, 10, 0.5, -25)
+button.Size = UDim2.new(0, 200, 0, 50)
+button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+button.Text = "Kamui Dimension"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 20
+
+-- CÀI ĐẶT
+local MODEL_ID = 424233726                                                      -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)            -- Vị trí teleport (X, Y, Z)
+
+-- TRẠNG THÁI
+local model = nil
+local savedCFrame = nil
+local teleported = false
+local debounce = false
+
+-- LẤY NHÂN VẬT
+local function getCharacter()
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	return char, hrp
+end
+
+-- DỊCH CHUYỂN
+local function teleport(cf)
+	local _, hrp = getCharacter()
+
+	hrp.AssemblyLinearVelocity = Vector3.zero
+	hrp.AssemblyAngularVelocity = Vector3.zero
+	hrp.CFrame = cf
+end
+
+-- TẢI MODEL
+local function loadModel()
+	local success, result = pcall(function()
+		return game:GetObjects("rbxassetid://" .. MODEL_ID)
+	end)
+
+	if success and result and result[1] then
+		local m = result[1]
+		m.Parent = workspace
+		return m
+	end
+
+	warn("Không load được model")
+	return nil
+end
+
+model = loadModel()
+
+-- NÚT LOGIC
+button.MouseButton1Click:Connect(function()
+	if debounce then return end
+	debounce = true
+
+	local _, hrp = getCharacter()
+
+	if not teleported then
+		-- Lần 1: lưu vị trí + teleport tới điểm mục tiêu
+		savedCFrame = hrp.CFrame
+		teleport(TARGET_CFRAME)
+		teleported = true
+	else
+		-- Lần 2: quay lại vị trí cũ
+		if savedCFrame then
+			teleport(savedCFrame)
+		end
+		teleported = false
+	end
+
+	task.wait(0.2)
+	debounce = false
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+nếu bị respawn (die) thì sẽ không có mất nút button và model
+-- NGƯỜI CHƠI & CÔNG CỤ
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- GIAO DIỆN (UI)
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Name = "MyTeleportUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Position = UDim2.new(0, 10, 0.5, -25)
+button.Size = UDim2.new(0, 200, 0, 50)
+button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+button.Text = "Kamui Dimension"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 20
+
+-- CÀI ĐẶT
+local MODEL_ID = 424233726                                                           -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)         -- Vị trí teleport (X, Y, Z)
+
+-- TRẠNG THÁI
+local model = nil
+local savedCFrame = nil
+local teleported = false
+local debounce = false
+local alive = true
+
+-- LẤY NHÂN VẬT
+local function getCharacter()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    return char, hrp
+end
+
+-- DỊCH CHUYỂN
+local function teleport(cf)
+    local _, hrp = getCharacter()
+
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    hrp.AssemblyAngularVelocity = Vector3.zero
+    hrp.CFrame = cf
+end
+
+-- TẢI MODEL
+local function loadModel()
+    local success, result = pcall(function()
+        return game:GetObjects("rbxassetid://" .. MODEL_ID)
+    end)
+
+    if success and result and result[1] then
+        local m = result[1]
+        m.Parent = workspace
+        return m
+    end
+
+    warn("Không load được model")
+    return nil
+end
+
+model = loadModel()
+
+-- NÚT LOGIC
+button.MouseButton1Click:Connect(function()
+    if debounce or not alive then return end
+    debounce = true
+
+    local _, hrp = getCharacter()
+
+    if not teleported then
+        savedCFrame = hrp.CFrame
+        teleport(TARGET_CFRAME)
+        teleported = true
+    else
+        if savedCFrame then
+            teleport(savedCFrame)
+        end
+        teleported = false
+    end
+
+    task.wait(0.2)
+    debounce = false
+end)
+
+-- DỌN DẸP
+local function cleanup()
+    alive = false
+
+    if screenGui then
+        screenGui:Destroy()
+    end
+
+    if model then
+        model:Destroy()
+        model = nil
+    end
+end
+
+-- MÓC NHÂN VẬT
+local function hookCharacter(char)
+    local humanoid = char:WaitForChild("Humanoid")
+
+    humanoid.Died:Connect(function()
+        cleanup()
+    end)
+end
+
+-- KÝ TỰ KHỞI TẠO
+if player.Character then
+    hookCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(function(char)
+    if not alive then return end
+    hookCharacter(char)
+end)
