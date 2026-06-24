@@ -29,8 +29,8 @@ button.Font = Enum.Font.SourceSansBold
 button.TextSize = 20
 
 -- CÀI ĐẶT
-local MODEL_ID = 6164248822                                                      -- ID model Roblox
-local TARGET_CFRAME = CFrame.new(104, -349, -571)            -- Vị trí teleport (X, Y, Z)
+local MODEL_ID = 6164248822                             -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(104, -349, -571)       -- Vị trí teleport (X, Y, Z)
 
 -- TRẠNG THÁI
 local model = nil
@@ -150,8 +150,8 @@ button.Font = Enum.Font.SourceSansBold
 button.TextSize = 20
 
 -- CÀI ĐẶT
-local MODEL_ID = 6164248822                                                      -- ID model Roblox
-local TARGET_CFRAME = CFrame.new(104, -349, -571)            -- Vị trí teleport (X, Y, Z)
+local MODEL_ID = 6164248822                             -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(104, -349, -571)       -- Vị trí teleport (X, Y, Z)
 
 -- TRẠNG THÁI
 local model = nil
@@ -314,8 +314,8 @@ button.Font = Enum.Font.SourceSansBold
 button.TextSize = 20
 
 -- CÀI ĐẶT
-local MODEL_ID = 424233726                                                      -- ID model Roblox
-local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)            -- Vị trí teleport (X, Y, Z)
+local MODEL_ID = 424233726                                 -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)       -- Vị trí teleport (X, Y, Z)
 
 -- TRẠNG THÁI
 local model = nil
@@ -435,8 +435,8 @@ button.Font = Enum.Font.SourceSansBold
 button.TextSize = 20
 
 -- CÀI ĐẶT
-local MODEL_ID = 424233726                                                           -- ID model Roblox
-local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)         -- Vị trí teleport (X, Y, Z)
+local MODEL_ID = 424233726                              -- ID model Roblox
+local TARGET_CFRAME = CFrame.new(-1916, -310, -1722)    -- Vị trí teleport (X, Y, Z)
 
 -- TRẠNG THÁI
 local model = nil
