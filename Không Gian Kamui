@@ -8,7 +8,7 @@ Position id           104, -349, -571
 
 
 
-nếu bị respawn (die) thì sẽ mất nút button và model
+nếu bị respawn (die) thì sẽ không có mất nút button và model
 -- NGƯỜI CHƠI & CÔNG CỤ
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -128,7 +128,7 @@ end)
 
 
 
-nếu bị respawn (die) thì sẽ không có mất nút button và model
+nếu bị respawn (die) thì sẽ mất nút button và model
 -- NGƯỜI CHƠI & CÔNG CỤ
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -293,7 +293,7 @@ Position id          -1916, -310, -1722
 
 
 
-nếu bị respawn (die) thì sẽ mất nút button và model
+nếu bị respawn (die) thì sẽ không có mất nút button và model
 -- NGƯỜI CHƠI & CÔNG CỤ
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -413,7 +413,7 @@ end)
 
 
 
-nếu bị respawn (die) thì sẽ không có mất nút button và model
+nếu bị respawn (die) thì sẽ mất nút button và model
 -- NGƯỜI CHƠI & CÔNG CỤ
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
