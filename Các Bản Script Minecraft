@@ -1985,19 +1985,20 @@ local Position = CFrame.new(0, -1, 0)
 local Rotation = CFrame.Angles(0, math.rad(0), 0)
 
 -- Cài đặt
-local ThrowSpeed = 100
+local ThrowSpeed = 100     -- Tốc độ Ném
 
 -- Cài đặt Loyalty
-local Loyalty = "OFF" -- ON/OFF Loyalty
-local LoyaltySpeed = 35
-local LoyaltyReturnTime = 5
-local LoyaltyRotation = CFrame.Angles(0, math.rad(0), 0)
+local Loyalty = "OFF"     -- ON/OFF Loyalty
+local LoyaltySpeed = 55     -- Tốc độ Loyalty
+local LoyaltyReturnTime = 5     -- Thời gian chờ Loyalty quay về
+local LoyaltyRotation = CFrame.Angles(0, math.rad(0), 0)     -- Gốc xoay Loyalty
 
 -- Cài đặt Riptide
-local Riptide = "OFF" -- ON/OFF Riptide
-local RiptideSpeed = 135
-local RiptideSpeedSpin = 0
-local RiptideSpinTime = 0
+local Riptide = "OFF"     -- ON/OFF Riptide
+local RiptideSpeed = 135     -- Tốc độ Riptide
+local RiptideCooldown = 0     -- Thời gian hồi Riptide
+local RiptideSpeedSpin = 0     -- Tốc độ xoay Riptide
+local RiptideSpinTime = 0     -- Thời gian xoay Riptide
 
 -- Tạo Công cụ
 local tool = Instance.new("Tool")
@@ -2021,6 +2022,7 @@ local PhysicsConnection
 local LoyaltyConnection
 local HasLanded = false
 local HasThrown = false
+local RiptideCooldownActive = false
 
 -- Tạo Tài nguyên
 local function addAsset()
@@ -2182,6 +2184,18 @@ end
 
 -- Riptide phóng nhân vật về vị trí đã bấm
 local function RiptideTrident()
+    if RiptideCooldown > 0 then
+        if RiptideCooldownActive then
+            return
+        end
+
+        RiptideCooldownActive = true
+
+        task.delay(RiptideCooldown, function()
+            RiptideCooldownActive = false
+        end)
+    end
+
     local Character = player.Character
 
     if not Character then
