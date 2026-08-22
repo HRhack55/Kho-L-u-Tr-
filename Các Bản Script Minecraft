@@ -1,1 +1,2583 @@
+Orbital Strike Cannon
 
+
+
+
+
+-- Khối TNT/Block TNT
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local root = character:WaitForChild("HumanoidRootPart")
+
+-- Cài đặt
+local TNT_Time = 4                                                    -- Thời gian TNT tồn tại
+local TNT_Texture_BlinkTime = 0.5                        -- Tốc độ chớp của texture
+local TNT_Fling_Force = 0                                 -- Lực Fling khi TNT nổ, 0 = tắt
+local TNT_Fling_Radius = 4                                 -- Bán kính Fling
+
+-- TNT
+local TNT = Instance.new("Part")
+TNT.Name = "TNT"
+TNT.Size = Vector3.new(4, 4, 4)
+TNT.Color = Color3.fromRGB(255, 255, 255)
+TNT.Material = Enum.Material.Neon
+TNT.Anchored = false
+TNT.CanCollide = true
+TNT.CFrame = root.CFrame * CFrame.new(0, 0, -15)
+TNT.Parent = workspace
+
+-- Âm thanh xì
+local TNT_Hiss = Instance.new("Sound")
+TNT_Hiss.SoundId = "rbxassetid://4633141679"
+TNT_Hiss.Volume = 1
+TNT_Hiss.Parent = TNT
+TNT_Hiss:Play()
+
+-- Âm thanh nổ
+local TNT_ExplosionSound = Instance.new("Sound")
+TNT_ExplosionSound.SoundId = "rbxassetid://112343351840629"
+TNT_ExplosionSound.Volume = 1
+
+-- Kết cấu
+local AroundTexture = Instance.new("Texture")
+AroundTexture.Texture = "rbxassetid://5522032314"
+AroundTexture.Face = Enum.NormalId.Front
+AroundTexture.StudsPerTileU = TNT.Size.X
+AroundTexture.StudsPerTileV = TNT.Size.Y
+AroundTexture.Parent = TNT
+
+local AroundTexture2 = AroundTexture:Clone()
+AroundTexture2.Face = Enum.NormalId.Back
+AroundTexture2.Parent = TNT
+
+local AroundTexture3 = AroundTexture:Clone()
+AroundTexture3.Face = Enum.NormalId.Left
+AroundTexture3.StudsPerTileU = TNT.Size.Z
+AroundTexture3.StudsPerTileV = TNT.Size.Y
+AroundTexture3.Parent = TNT
+
+local AroundTexture4 = AroundTexture:Clone()
+AroundTexture4.Face = Enum.NormalId.Right
+AroundTexture4.StudsPerTileU = TNT.Size.Z
+AroundTexture4.StudsPerTileV = TNT.Size.Y
+AroundTexture4.Parent = TNT
+
+local TopTexture = Instance.new("Texture")
+TopTexture.Texture = "rbxassetid://5522034026"
+TopTexture.Face = Enum.NormalId.Top
+TopTexture.StudsPerTileU = TNT.Size.X
+TopTexture.StudsPerTileV = TNT.Size.Z
+TopTexture.Parent = TNT
+
+local BottomTexture = Instance.new("Texture")
+BottomTexture.Texture = "rbxassetid://124194880868071"
+BottomTexture.Face = Enum.NormalId.Bottom
+BottomTexture.StudsPerTileU = TNT.Size.X
+BottomTexture.StudsPerTileV = TNT.Size.Z
+BottomTexture.Parent = TNT
+
+-- Nhấp nháy Texture
+local StartTime = tick()
+local TextureVisible = true
+
+while TNT.Parent and tick() - StartTime < TNT_Time do
+    TextureVisible = not TextureVisible
+
+    AroundTexture.Transparency = TextureVisible and 0 or 1
+    AroundTexture2.Transparency = TextureVisible and 0 or 1
+    AroundTexture3.Transparency = TextureVisible and 0 or 1
+    AroundTexture4.Transparency = TextureVisible and 0 or 1
+    TopTexture.Transparency = TextureVisible and 0 or 1
+    BottomTexture.Transparency = TextureVisible and 0 or 1
+
+    task.wait(TNT_Texture_BlinkTime)
+end
+
+-- Nổ TNT
+if TNT.Parent then
+    local TNT_ExplosionSoundClone = TNT_ExplosionSound:Clone()
+    TNT_ExplosionSoundClone.Parent = SoundService
+    TNT_ExplosionSoundClone:Play()
+
+    local Explosion = Instance.new("Explosion")
+    Explosion.Position = TNT.Position
+    Explosion.BlastRadius = 0
+    Explosion.BlastPressure = 0
+    Explosion.DestroyJointRadiusPercent = 0
+    Explosion.Parent = workspace
+
+    -- Fling khi TNT nổ
+    if TNT_Fling_Force > 0 and character.Parent and root.Parent then
+        local Distance = (root.Position - TNT.Position).Magnitude
+
+        if Distance <= TNT_Fling_Radius then
+            local Direction = root.Position - TNT.Position
+
+            if Direction.Magnitude > 0 then
+                Direction = Direction.Unit
+                root.AssemblyLinearVelocity =
+                    root.AssemblyLinearVelocity + Direction * TNT_Fling_Force
+            end
+        end
+    end
+
+    TNT:Destroy()
+
+    TNT_ExplosionSoundClone.Ended:Connect(function()
+        TNT_ExplosionSoundClone:Destroy()
+    end)
+end
+
+
+
+
+
+-- Orbital Strike Cannon
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local root = character:WaitForChild("HumanoidRootPart")
+
+-- Cài đặt
+local TNT_Texture_BlinkTime = 0.5    -- Tốc độ chớp của texture
+local TNT_Time = 4                              -- Thời gian TNT tồn tại
+local Spawn_TNT_Height = 55           -- Độ cao spawn TNT
+local TNT_Ring_Distance = 8           -- Khoảng cách giữa các vòng
+local TNT_Fling_Force = 0           -- Lực Fling khi TNT nổ, 0 = tắt
+local TNT_Fling_Radius = 4           -- Bán kính Fling
+local TNT_Max_Ring = 20               -- Số vòng muốn sử dụng bạn có thể chỉnh thành bao nhiêu tùy ý
+
+-- Số TNT của từng vòng
+-- 0 = không hoạt động
+-- 1 trở lên = vòng đó hoạt động
+local TNT_Per_Ring = {
+    [0] = 1,
+    [1] = 0,
+    [2] = 0,
+    [3] = 0,
+    [4] = 0,
+    [5] = 0,
+    [6] = 0,
+    [7] = 0,
+    [8] = 0,
+    [9] = 0,
+    [10] = 0,
+    [11] = 0,
+    [12] = 0,
+    [13] = 0,
+    [14] = 0,
+    [15] = 0,
+    [16] = 0,
+    [17] = 0,
+    [18] = 0,
+    [19] = 0,
+    [20] = 0
+}
+
+-- Vị trí trung tâm
+local Center = root.Position + Vector3.new(0, Spawn_TNT_Height, -15)
+
+-- Tạo TNT
+local function CreateTNT(Position)
+    local TNT = Instance.new("Part")
+    TNT.Name = "TNT"
+    TNT.Size = Vector3.new(4, 4, 4)
+    TNT.Color = Color3.fromRGB(255, 255, 255)
+    TNT.Material = Enum.Material.Neon
+    TNT.Anchored = false
+    TNT.CanCollide = true
+    TNT.Position = Position
+    TNT.Parent = workspace
+
+    -- Âm thanh xì
+    local TNT_Hiss = Instance.new("Sound")
+    TNT_Hiss.SoundId = "rbxassetid://4633141679"
+    TNT_Hiss.Volume = 1
+    TNT_Hiss.Parent = TNT
+    TNT_Hiss:Play()
+
+    -- Âm thanh nổ
+    local TNT_ExplosionSound = Instance.new("Sound")
+    TNT_ExplosionSound.SoundId = "rbxassetid://112343351840629"
+    TNT_ExplosionSound.Volume = 1
+
+    -- Kết cấu
+    local AroundTexture = Instance.new("Texture")
+    AroundTexture.Texture = "rbxassetid://5522032314"
+    AroundTexture.Face = Enum.NormalId.Front
+    AroundTexture.StudsPerTileU = TNT.Size.X
+    AroundTexture.StudsPerTileV = TNT.Size.Y
+    AroundTexture.Parent = TNT
+
+    local AroundTexture2 = AroundTexture:Clone()
+    AroundTexture2.Face = Enum.NormalId.Back
+    AroundTexture2.Parent = TNT
+
+    local AroundTexture3 = AroundTexture:Clone()
+    AroundTexture3.Face = Enum.NormalId.Left
+    AroundTexture3.StudsPerTileU = TNT.Size.Z
+    AroundTexture3.StudsPerTileV = TNT.Size.Y
+    AroundTexture3.Parent = TNT
+
+    local AroundTexture4 = AroundTexture:Clone()
+    AroundTexture4.Face = Enum.NormalId.Right
+    AroundTexture4.StudsPerTileU = TNT.Size.Z
+    AroundTexture4.StudsPerTileV = TNT.Size.Y
+    AroundTexture4.Parent = TNT
+
+    local TopTexture = Instance.new("Texture")
+    TopTexture.Texture = "rbxassetid://5522034026"
+    TopTexture.Face = Enum.NormalId.Top
+    TopTexture.StudsPerTileU = TNT.Size.X
+    TopTexture.StudsPerTileV = TNT.Size.Z
+    TopTexture.Parent = TNT
+
+    local BottomTexture = Instance.new("Texture")
+    BottomTexture.Texture = "rbxassetid://124194880868071"
+    BottomTexture.Face = Enum.NormalId.Bottom
+    BottomTexture.StudsPerTileU = TNT.Size.X
+    BottomTexture.StudsPerTileV = TNT.Size.Z
+    BottomTexture.Parent = TNT
+
+    -- Nhấp nháy Texture
+    task.spawn(function()
+        local StartTime = tick()
+        local TextureVisible = true
+
+        while TNT.Parent and tick() - StartTime < TNT_Time do
+            TextureVisible = not TextureVisible
+
+            AroundTexture.Transparency = TextureVisible and 0 or 1
+            AroundTexture2.Transparency = TextureVisible and 0 or 1
+            AroundTexture3.Transparency = TextureVisible and 0 or 1
+            AroundTexture4.Transparency = TextureVisible and 0 or 1
+            TopTexture.Transparency = TextureVisible and 0 or 1
+            BottomTexture.Transparency = TextureVisible and 0 or 1
+
+            task.wait(TNT_Texture_BlinkTime)
+        end
+    end)
+
+    -- Thời gian nổ
+    task.delay(TNT_Time, function()
+        if TNT.Parent then
+            local ExplosionSound = TNT_ExplosionSound:Clone()
+            ExplosionSound.Parent = SoundService
+            ExplosionSound:Play()
+
+            local Explosion = Instance.new("Explosion")
+            Explosion.Position = TNT.Position
+            Explosion.BlastRadius = 0
+            Explosion.BlastPressure = 0
+            Explosion.DestroyJointRadiusPercent = 0
+            Explosion.Parent = workspace
+
+            -- Fling khi TNT nổ
+            if TNT_Fling_Force > 0 and character.Parent and root.Parent then
+                local Distance = (root.Position - TNT.Position).Magnitude
+
+                if Distance <= TNT_Fling_Radius then
+                    local Direction = root.Position - TNT.Position
+
+                    if Direction.Magnitude > 0 then
+                        Direction = Direction.Unit
+                        root.AssemblyLinearVelocity =
+                            root.AssemblyLinearVelocity + Direction * TNT_Fling_Force
+                    end
+                end
+            end
+
+            TNT:Destroy()
+
+            ExplosionSound.Ended:Connect(function()
+                ExplosionSound:Destroy()
+            end)
+        end
+    end)
+end
+
+-- TNT ở giữa
+local Center_Count = TNT_Per_Ring[0] or 0
+
+if Center_Count > 0 then
+    for i = 1, Center_Count do
+        CreateTNT(Center)
+    end
+end
+
+-- Các vòng TNT
+for Ring = 1, TNT_Max_Ring do
+    local TNT_Count = TNT_Per_Ring[Ring] or 0
+
+    -- Chỉ hoạt động khi số TNT lớn hơn 0
+    if TNT_Count > 0 then
+        local Radius = Ring * TNT_Ring_Distance
+
+        for i = 1, TNT_Count do
+            local Angle = (i - 1) * (math.pi * 2 / TNT_Count)
+
+            local X = math.cos(Angle) * Radius
+            local Z = math.sin(Angle) * Radius
+
+            CreateTNT(Center + Vector3.new(X, 0, Z))
+        end
+    end
+end
+
+
+
+
+
+-- Nuke Shot Dùng Nhiều Lần
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local Mouse = player:GetMouse()
+
+-- Tài nguyên
+local AssetId = "121035700898871" -- ID tài nguyên
+local Position = CFrame.new(0, -1.3, -1) -- Vị trí
+local Rotation = CFrame.Angles(0, math.rad(-90), 20) -- Xoay
+
+-- Cài đặt dây câu
+local RopeLimit = 32 -- Giới hạn dây
+local ThrowSpeed = 55 -- Tốc độ ném
+local RopePosition = Vector3.new(0, -1.8, -2.3) -- Vị trí dây câu
+local Gravity = workspace.Gravity -- Trọng lực
+
+-- Cài đặt TNT
+local TNT_Texture_BlinkTime = 0.5    -- Tốc độ chớp của texture
+local TNT_Time = 4                   -- Thời gian TNT tồn tại
+local Spawn_TNT_Height = 55          -- Độ cao spawn TNT
+local TNT_Ring_Distance = 8           -- Khoảng cách giữa các vòng
+local TNT_Fling_Force = 0             -- Lực Fling khi TNT nổ, 0 = tắt
+local TNT_Fling_Radius = 4             -- Bán kính Fling
+local TNT_Max_Ring = 20                -- Số vòng muốn sử dụng bạn có thể chỉnh thành bao nhiêu tùy ý
+
+-- Số TNT của từng vòng
+-- 0 = không hoạt động
+-- 1 trở lên = vòng đó hoạt động
+local TNT_Per_Ring = {
+    [0] = 1,
+    [1] = 0,
+    [2] = 0,
+    [3] = 0,
+    [4] = 0,
+    [5] = 0,
+    [6] = 0,
+    [7] = 0,
+    [8] = 0,
+    [9] = 0,
+    [10] = 0,
+    [11] = 0,
+    [12] = 0,
+    [13] = 0,
+    [14] = 0,
+    [15] = 0,
+    [16] = 0,
+    [17] = 0,
+    [18] = 0,
+    [19] = 0,
+    [20] = 0
+}
+
+-- Tạo Công cụ
+local tool = Instance.new("Tool")
+tool.Name = "Nuke Shot"
+tool.RequiresHandle = true
+tool.CanBeDropped = false
+
+local Handle = Instance.new("Part")
+Handle.Name = "Handle"
+Handle.Size = Vector3.new(1, 1, 1)
+Handle.Transparency = 1
+Handle.CanCollide = false
+Handle.CanTouch = false
+Handle.CanQuery = false
+Handle.Parent = tool
+
+tool.Parent = player:WaitForChild("Backpack")
+
+local asset
+local Hook
+local IsThrowing = false
+local OSCActivated = false
+
+local RopeNodes = {}
+local RopeBeams = {}
+local RopeUpdateConnection
+local PhysicsConnection
+
+local RopeSegmentCount = 14
+
+-- Tạo dây câu
+local function CreateFishingLine()
+    local Character = player.Character
+    if not Character then return end
+
+    local RightArm =
+        Character:FindFirstChild("RightHand")
+        or Character:FindFirstChild("Right Arm")
+        or Character:FindFirstChild("RightUpperArm")
+
+    if not RightArm then return end
+
+    -- Tạo móc câu
+    if not Hook then
+        Hook = Instance.new("Part")
+        Hook.Name = "FishingHook"
+        Hook.Size = Vector3.new(0.2, 0.2, 0.2)
+        Hook.Shape = Enum.PartType.Ball
+        Hook.Color = Color3.fromRGB(180, 180, 180)
+        Hook.Material = Enum.Material.Metal
+        Hook.CanCollide = false
+        Hook.CanTouch = false
+        Hook.CanQuery = false
+        Hook.Anchored = true
+        Hook.Parent = workspace
+    end
+
+    -- Xóa dây cũ
+    for _, Beam in ipairs(RopeBeams) do
+        if Beam then
+            Beam:Destroy()
+        end
+    end
+
+    for _, Node in ipairs(RopeNodes) do
+        if Node then
+            Node:Destroy()
+        end
+    end
+
+    table.clear(RopeBeams)
+    table.clear(RopeNodes)
+
+    -- Tạo các điểm dây
+    for i = 1, RopeSegmentCount + 1 do
+        local Node = Instance.new("Part")
+        Node.Name = "RopePoint_" .. i
+        Node.Size = Vector3.new(0.05, 0.05, 0.05)
+        Node.Transparency = 1
+        Node.Anchored = true
+        Node.CanCollide = false
+        Node.CanTouch = false
+        Node.CanQuery = false
+        Node.Parent = workspace
+
+        local Attachment = Instance.new("Attachment")
+        Attachment.Parent = Node
+
+        RopeNodes[i] = Node
+    end
+
+    -- Tạo từng đoạn dây
+    for i = 1, RopeSegmentCount do
+        local Beam = Instance.new("Beam")
+
+        Beam.Name = "FishingLine_" .. i
+        Beam.Attachment0 = RopeNodes[i].Attachment
+        Beam.Attachment1 = RopeNodes[i + 1].Attachment
+        Beam.Width0 = 0.018
+        Beam.Width1 = 0.018
+        Beam.Color = ColorSequence.new(
+            Color3.fromRGB(25, 25, 25)
+        )
+        Beam.Transparency = NumberSequence.new(0)
+        Beam.FaceCamera = true
+        Beam.LightEmission = 0
+        Beam.LightInfluence = 1
+        Beam.Segments = 2
+        Beam.Parent = RopeNodes[i]
+
+        RopeBeams[i] = Beam
+    end
+
+    -- Cập nhật dây
+    if RopeUpdateConnection then
+        RopeUpdateConnection:Disconnect()
+    end
+
+    RopeUpdateConnection =
+        RunService.RenderStepped:Connect(function()
+
+            if not Hook or not Hook.Parent then
+                return
+            end
+
+            local CurrentCharacter =
+                player.Character
+
+            if not CurrentCharacter then
+                return
+            end
+
+            local CurrentRightArm =
+                CurrentCharacter:FindFirstChild("RightHand")
+                or CurrentCharacter:FindFirstChild("Right Arm")
+                or CurrentCharacter:FindFirstChild("RightUpperArm")
+
+            if not CurrentRightArm then
+                return
+            end
+
+            -- Điểm đầu dây bám theo cần/tay
+            local StartPosition =
+                CurrentRightArm.CFrame:PointToWorldSpace(
+                    RopePosition
+                )
+
+            -- Móc giữ nguyên vị trí world
+            local EndPosition =
+                Hook.Position
+
+            local Distance =
+                (EndPosition - StartPosition).Magnitude
+
+            -- Độ võng nhẹ kiểu dây câu
+            local Sag =
+                math.clamp(
+                    Distance * 0.08,
+                    0,
+                    3
+                )
+
+            for i = 1, #RopeNodes do
+
+                local T =
+                    (i - 1) / RopeSegmentCount
+
+                local NodePosition =
+                    StartPosition:Lerp(
+                        EndPosition,
+                        T
+                    )
+
+                -- Võng nhẹ xuống
+                local SagAmount =
+                    4 * T * (1 - T)
+
+                NodePosition -=
+                    Vector3.new(
+                        0,
+                        Sag * SagAmount,
+                        0
+                    )
+
+                RopeNodes[i].Position =
+                    NodePosition
+            end
+        end)
+end
+
+-- Quăng móc câu
+local function ThrowHook()
+
+    if IsThrowing then
+        return
+    end
+
+    local Character =
+        player.Character
+
+    if not Character then
+        return
+    end
+
+    local RightArm =
+        Character:FindFirstChild("RightHand")
+        or Character:FindFirstChild("Right Arm")
+        or Character:FindFirstChild("RightUpperArm")
+
+    if not RightArm then
+        return
+    end
+
+    CreateFishingLine()
+
+    IsThrowing = true
+
+    -- Điểm cast ban đầu
+    local StartPosition =
+        RightArm.CFrame:PointToWorldSpace(
+            RopePosition
+        )
+
+    local TargetPosition =
+        Mouse.Hit.Position
+
+    -- Giới hạn khoảng cách
+    local Direction =
+        TargetPosition - StartPosition
+
+    local Distance =
+        Direction.Magnitude
+
+    if Distance > RopeLimit then
+        TargetPosition =
+            StartPosition
+            + Direction.Unit * RopeLimit
+    end
+
+    -- Hướng quăng
+    local DirectionToTarget =
+        (TargetPosition - StartPosition).Unit
+
+    local Velocity =
+        DirectionToTarget * ThrowSpeed
+
+    local CurrentPosition =
+        StartPosition
+
+    Hook.Position =
+        CurrentPosition
+
+    -- Raycast
+    local RaycastParams =
+        RaycastParams.new()
+
+    RaycastParams.FilterType =
+        Enum.RaycastFilterType.Exclude
+
+    RaycastParams.FilterDescendantsInstances = {
+        Character,
+        Hook
+    }
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+    end
+
+    PhysicsConnection =
+        RunService.Heartbeat:Connect(function(
+            DeltaTime
+        )
+
+            if not Hook or not Hook.Parent then
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            local PreviousPosition =
+                CurrentPosition
+
+            -- Trọng lực
+            Velocity +=
+                Vector3.new(
+                    0,
+                    -Gravity,
+                    0
+                ) * DeltaTime
+
+            -- Di chuyển móc
+            CurrentPosition +=
+                Velocity * DeltaTime
+
+            -- Raycast
+            local RayDirection =
+                CurrentPosition
+                - PreviousPosition
+
+            local Hit =
+                workspace:Raycast(
+                    PreviousPosition,
+                    RayDirection,
+                    RaycastParams
+                )
+
+            if Hit then
+
+                CurrentPosition =
+                    Hit.Position
+
+                Hook.Position =
+                    CurrentPosition
+
+                IsThrowing = false
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            -- Giới hạn dây
+            local DistanceFromHand =
+                (
+                    CurrentPosition
+                    - StartPosition
+                ).Magnitude
+
+            if DistanceFromHand >= RopeLimit then
+
+                local DirectionFromHand =
+                    (
+                        CurrentPosition
+                        - StartPosition
+                    ).Unit
+
+                CurrentPosition =
+                    StartPosition
+                    + DirectionFromHand
+                    * RopeLimit
+
+                Hook.Position =
+                    CurrentPosition
+
+                IsThrowing = false
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            Hook.Position =
+                CurrentPosition
+        end)
+end
+
+-- Tạo TNT
+local function CreateTNT(TNTPosition, character, root)
+
+    local TNT = Instance.new("Part")
+    TNT.Name = "TNT"
+    TNT.Size = Vector3.new(4, 4, 4)
+    TNT.Color = Color3.fromRGB(255, 255, 255)
+    TNT.Material = Enum.Material.Neon
+    TNT.Anchored = false
+    TNT.CanCollide = true
+    TNT.Position = TNTPosition
+    TNT.Parent = workspace
+
+    -- Âm thanh xì
+    local TNT_Hiss = Instance.new("Sound")
+    TNT_Hiss.SoundId = "rbxassetid://4633141679"
+    TNT_Hiss.Volume = 1
+    TNT_Hiss.Parent = TNT
+    TNT_Hiss:Play()
+
+    -- Âm thanh nổ
+    local TNT_ExplosionSound = Instance.new("Sound")
+    TNT_ExplosionSound.SoundId = "rbxassetid://112343351840629"
+    TNT_ExplosionSound.Volume = 1
+
+    -- Kết cấu
+    local AroundTexture = Instance.new("Texture")
+    AroundTexture.Texture = "rbxassetid://5522032314"
+    AroundTexture.Face = Enum.NormalId.Front
+    AroundTexture.StudsPerTileU = TNT.Size.X
+    AroundTexture.StudsPerTileV = TNT.Size.Y
+    AroundTexture.Parent = TNT
+
+    local AroundTexture2 = AroundTexture:Clone()
+    AroundTexture2.Face = Enum.NormalId.Back
+    AroundTexture2.Parent = TNT
+
+    local AroundTexture3 = AroundTexture:Clone()
+    AroundTexture3.Face = Enum.NormalId.Left
+    AroundTexture3.StudsPerTileU = TNT.Size.Z
+    AroundTexture3.StudsPerTileV = TNT.Size.Y
+    AroundTexture3.Parent = TNT
+
+    local AroundTexture4 = AroundTexture:Clone()
+    AroundTexture4.Face = Enum.NormalId.Right
+    AroundTexture4.StudsPerTileU = TNT.Size.Z
+    AroundTexture4.StudsPerTileV = TNT.Size.Y
+    AroundTexture4.Parent = TNT
+
+    local TopTexture = Instance.new("Texture")
+    TopTexture.Texture = "rbxassetid://5522034026"
+    TopTexture.Face = Enum.NormalId.Top
+    TopTexture.StudsPerTileU = TNT.Size.X
+    TopTexture.StudsPerTileV = TNT.Size.Z
+    TopTexture.Parent = TNT
+
+    local BottomTexture = Instance.new("Texture")
+    BottomTexture.Texture = "rbxassetid://124194880868071"
+    BottomTexture.Face = Enum.NormalId.Bottom
+    BottomTexture.StudsPerTileU = TNT.Size.X
+    BottomTexture.StudsPerTileV = TNT.Size.Z
+    BottomTexture.Parent = TNT
+
+    -- Nhấp nháy Texture
+    task.spawn(function()
+
+        local StartTime = tick()
+        local TextureVisible = true
+
+        while TNT.Parent and tick() - StartTime < TNT_Time do
+
+            TextureVisible =
+                not TextureVisible
+
+            AroundTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture2.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture3.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture4.Transparency =
+                TextureVisible and 0 or 1
+
+            TopTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            BottomTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            task.wait(TNT_Texture_BlinkTime)
+        end
+    end)
+
+    -- Thời gian nổ
+    task.delay(TNT_Time, function()
+
+        if TNT.Parent then
+
+            local ExplosionSound =
+                TNT_ExplosionSound:Clone()
+
+            ExplosionSound.Parent =
+                SoundService
+
+            ExplosionSound:Play()
+
+            local Explosion =
+                Instance.new("Explosion")
+
+            Explosion.Position =
+                TNT.Position
+
+            Explosion.BlastRadius =
+                0
+
+            Explosion.BlastPressure =
+                0
+
+            Explosion.DestroyJointRadiusPercent =
+                0
+
+            Explosion.Parent =
+                workspace
+
+            -- Fling khi TNT nổ
+            if TNT_Fling_Force > 0
+                and character.Parent
+                and root.Parent then
+
+                local Distance =
+                    (root.Position - TNT.Position).Magnitude
+
+                if Distance <= TNT_Fling_Radius then
+
+                    local Direction =
+                        root.Position - TNT.Position
+
+                    if Direction.Magnitude > 0 then
+
+                        Direction =
+                            Direction.Unit
+
+                        root.AssemblyLinearVelocity =
+                            root.AssemblyLinearVelocity
+                            + Direction * TNT_Fling_Force
+                    end
+                end
+            end
+
+            TNT:Destroy()
+
+            ExplosionSound.Ended:Connect(function()
+                ExplosionSound:Destroy()
+            end)
+        end
+    end)
+end
+
+-- Kích hoạt TNT tại móc câu
+local function ActivateOSC()
+
+    if not Hook or not Hook.Parent then
+        return
+    end
+
+    local Character =
+        player.Character
+
+    if not Character then
+        return
+    end
+
+    local root =
+        Character:FindFirstChild("HumanoidRootPart")
+
+    if not root then
+        return
+    end
+
+    -- Vị trí trung tâm
+    local Center =
+        Hook.Position
+        + Vector3.new(
+            0,
+            Spawn_TNT_Height,
+            0
+        )
+
+    -- TNT ở giữa
+    local Center_Count =
+        TNT_Per_Ring[0] or 0
+
+    if Center_Count > 0 then
+
+        for i = 1, Center_Count do
+
+            CreateTNT(
+                Center,
+                Character,
+                root
+            )
+        end
+    end
+
+    -- Các vòng TNT
+    for Ring = 1, TNT_Max_Ring do
+
+        local TNT_Count =
+            TNT_Per_Ring[Ring] or 0
+
+        -- Chỉ hoạt động khi số TNT lớn hơn 0
+        if TNT_Count > 0 then
+
+            local Radius =
+                Ring * TNT_Ring_Distance
+
+            for i = 1, TNT_Count do
+
+                local Angle =
+                    (i - 1)
+                    * (math.pi * 2 / TNT_Count)
+
+                local X =
+                    math.cos(Angle)
+                    * Radius
+
+                local Z =
+                    math.sin(Angle)
+                    * Radius
+
+                CreateTNT(
+                    Center + Vector3.new(0, 0, 0)
+                    + Vector3.new(X, 0, Z),
+                    Character,
+                    root
+                )
+            end
+        end
+    end
+end
+
+-- Xóa dây câu
+local function RemoveFishingLine()
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+        PhysicsConnection = nil
+    end
+
+    if RopeUpdateConnection then
+        RopeUpdateConnection:Disconnect()
+        RopeUpdateConnection = nil
+    end
+
+    for _, Beam in ipairs(RopeBeams) do
+
+        if Beam then
+            Beam:Destroy()
+        end
+    end
+
+    for _, Node in ipairs(RopeNodes) do
+
+        if Node then
+            Node:Destroy()
+        end
+    end
+
+    table.clear(RopeBeams)
+    table.clear(RopeNodes)
+
+    if Hook then
+        Hook:Destroy()
+        Hook = nil
+    end
+
+    IsThrowing = false
+    OSCActivated = false
+end
+
+-- Tạo Tài nguyên
+local function addAsset()
+
+    local Character =
+        player.Character
+        or player.CharacterAdded:Wait()
+
+    local RightArm =
+        Character:FindFirstChild("RightUpperArm")
+        or Character:FindFirstChild("Right Arm")
+
+    if not RightArm then
+        return
+    end
+
+    local success, accessory =
+        pcall(function()
+
+            return game:GetObjects(
+                "rbxassetid://" .. AssetId
+            )[1]
+        end)
+
+    if not success or not accessory then
+        return
+    end
+
+    local handle =
+        accessory:FindFirstChild("Handle")
+
+    if not handle then
+
+        accessory:Destroy()
+
+        return
+    end
+
+    accessory.Parent =
+        Character
+
+    local weld =
+        Instance.new("Motor6D")
+
+    weld.Part0 =
+        RightArm
+
+    weld.Part1 =
+        handle
+
+    weld.C0 =
+        Position * Rotation
+
+    weld.Parent =
+        handle
+
+    asset =
+        accessory
+end
+
+-- Xóa Tài nguyên
+local function removeAsset()
+
+    if asset then
+
+        asset:Destroy()
+
+        asset = nil
+    end
+end
+
+-- Kết nối Công cụ
+tool.Equipped:Connect(addAsset)
+
+tool.Unequipped:Connect(removeAsset)
+
+tool.Activated:Connect(function()
+
+    -- Bấm lần 1
+    if not Hook or not Hook.Parent then
+
+        OSCActivated = false
+
+        ThrowHook()
+
+        return
+    end
+
+    -- Bấm lần 2
+    if not OSCActivated then
+
+        OSCActivated = true
+
+        ActivateOSC()
+    end
+end)
+
+tool.Unequipped:Connect(RemoveFishingLine)
+
+
+
+
+
+-- Nuke Shot Dùng Một Lần Và Nó Sẽ Bể
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local Mouse = player:GetMouse()
+
+-- Tài nguyên
+local AssetId = "121035700898871" -- ID tài nguyên
+local Position = CFrame.new(0, -1.3, -1) -- Vị trí
+local Rotation = CFrame.Angles(0, math.rad(-90), 20) -- Xoay
+
+-- Cài đặt dây câu
+local RopeLimit = 32 -- Giới hạn dây
+local ThrowSpeed = 55 -- Tốc độ ném
+local RopePosition = Vector3.new(0, -1.8, -2.3) -- Vị trí dây câu
+local Gravity = workspace.Gravity -- Trọng lực
+
+-- Cài đặt TNT
+local TNT_Texture_BlinkTime = 0.5    -- Tốc độ chớp của texture
+local TNT_Time = 4                   -- Thời gian TNT tồn tại
+local Spawn_TNT_Height = 55          -- Độ cao spawn TNT
+local TNT_Ring_Distance = 8           -- Khoảng cách giữa các vòng
+local TNT_Fling_Force = 0             -- Lực Fling khi TNT nổ, 0 = tắt
+local TNT_Fling_Radius = 4             -- Bán kính Fling
+local TNT_Max_Ring = 20                -- Số vòng muốn sử dụng bạn có thể chỉnh thành bao nhiêu tùy ý
+
+-- Số TNT của từng vòng
+-- 0 = không hoạt động
+-- 1 trở lên = vòng đó hoạt động
+local TNT_Per_Ring = {
+    [0] = 1,
+    [1] = 0,
+    [2] = 0,
+    [3] = 0,
+    [4] = 0,
+    [5] = 0,
+    [6] = 0,
+    [7] = 0,
+    [8] = 0,
+    [9] = 0,
+    [10] = 0,
+    [11] = 0,
+    [12] = 0,
+    [13] = 0,
+    [14] = 0,
+    [15] = 0,
+    [16] = 0,
+    [17] = 0,
+    [18] = 0,
+    [19] = 0,
+    [20] = 0
+}
+
+-- Tạo Công cụ
+local tool = Instance.new("Tool")
+tool.Name = "Nuke Shot"
+tool.RequiresHandle = true
+tool.CanBeDropped = false
+
+local Handle = Instance.new("Part")
+Handle.Name = "Handle"
+Handle.Size = Vector3.new(1, 1, 1)
+Handle.Transparency = 1
+Handle.CanCollide = false
+Handle.CanTouch = false
+Handle.CanQuery = false
+Handle.Parent = tool
+
+tool.Parent = player:WaitForChild("Backpack")
+
+local asset
+local Hook
+local IsThrowing = false
+local OSCActivated = false
+
+local RopeNodes = {}
+local RopeBeams = {}
+local RopeUpdateConnection
+local PhysicsConnection
+
+local RopeSegmentCount = 14
+
+-- Tạo dây câu
+local function CreateFishingLine()
+    local Character = player.Character
+    if not Character then return end
+
+    local RightArm =
+        Character:FindFirstChild("RightHand")
+        or Character:FindFirstChild("Right Arm")
+        or Character:FindFirstChild("RightUpperArm")
+
+    if not RightArm then return end
+
+    -- Tạo móc câu
+    if not Hook then
+        Hook = Instance.new("Part")
+        Hook.Name = "FishingHook"
+        Hook.Size = Vector3.new(0.2, 0.2, 0.2)
+        Hook.Shape = Enum.PartType.Ball
+        Hook.Color = Color3.fromRGB(180, 180, 180)
+        Hook.Material = Enum.Material.Metal
+        Hook.CanCollide = false
+        Hook.CanTouch = false
+        Hook.CanQuery = false
+        Hook.Anchored = true
+        Hook.Parent = workspace
+    end
+
+    -- Xóa dây cũ
+    for _, Beam in ipairs(RopeBeams) do
+        if Beam then
+            Beam:Destroy()
+        end
+    end
+
+    for _, Node in ipairs(RopeNodes) do
+        if Node then
+            Node:Destroy()
+        end
+    end
+
+    table.clear(RopeBeams)
+    table.clear(RopeNodes)
+
+    -- Tạo các điểm dây
+    for i = 1, RopeSegmentCount + 1 do
+        local Node = Instance.new("Part")
+        Node.Name = "RopePoint_" .. i
+        Node.Size = Vector3.new(0.05, 0.05, 0.05)
+        Node.Transparency = 1
+        Node.Anchored = true
+        Node.CanCollide = false
+        Node.CanTouch = false
+        Node.CanQuery = false
+        Node.Parent = workspace
+
+        local Attachment = Instance.new("Attachment")
+        Attachment.Parent = Node
+
+        RopeNodes[i] = Node
+    end
+
+    -- Tạo từng đoạn dây
+    for i = 1, RopeSegmentCount do
+        local Beam = Instance.new("Beam")
+
+        Beam.Name = "FishingLine_" .. i
+        Beam.Attachment0 = RopeNodes[i].Attachment
+        Beam.Attachment1 = RopeNodes[i + 1].Attachment
+        Beam.Width0 = 0.018
+        Beam.Width1 = 0.018
+        Beam.Color = ColorSequence.new(
+            Color3.fromRGB(25, 25, 25)
+        )
+        Beam.Transparency = NumberSequence.new(0)
+        Beam.FaceCamera = true
+        Beam.LightEmission = 0
+        Beam.LightInfluence = 1
+        Beam.Segments = 2
+        Beam.Parent = RopeNodes[i]
+
+        RopeBeams[i] = Beam
+    end
+
+    -- Cập nhật dây
+    if RopeUpdateConnection then
+        RopeUpdateConnection:Disconnect()
+    end
+
+    RopeUpdateConnection =
+        RunService.RenderStepped:Connect(function()
+
+            if not Hook or not Hook.Parent then
+                return
+            end
+
+            local CurrentCharacter =
+                player.Character
+
+            if not CurrentCharacter then
+                return
+            end
+
+            local CurrentRightArm =
+                CurrentCharacter:FindFirstChild("RightHand")
+                or CurrentCharacter:FindFirstChild("Right Arm")
+                or CurrentCharacter:FindFirstChild("RightUpperArm")
+
+            if not CurrentRightArm then
+                return
+            end
+
+            -- Điểm đầu dây bám theo cần/tay
+            local StartPosition =
+                CurrentRightArm.CFrame:PointToWorldSpace(
+                    RopePosition
+                )
+
+            -- Móc giữ nguyên vị trí world
+            local EndPosition =
+                Hook.Position
+
+            local Distance =
+                (EndPosition - StartPosition).Magnitude
+
+            -- Độ võng nhẹ kiểu dây câu
+            local Sag =
+                math.clamp(
+                    Distance * 0.08,
+                    0,
+                    3
+                )
+
+            for i = 1, #RopeNodes do
+
+                local T =
+                    (i - 1) / RopeSegmentCount
+
+                local NodePosition =
+                    StartPosition:Lerp(
+                        EndPosition,
+                        T
+                    )
+
+                -- Võng nhẹ xuống
+                local SagAmount =
+                    4 * T * (1 - T)
+
+                NodePosition -=
+                    Vector3.new(
+                        0,
+                        Sag * SagAmount,
+                        0
+                    )
+
+                RopeNodes[i].Position =
+                    NodePosition
+            end
+        end)
+end
+
+-- Quăng móc câu
+local function ThrowHook()
+
+    if IsThrowing then
+        return
+    end
+
+    local Character =
+        player.Character
+
+    if not Character then
+        return
+    end
+
+    local RightArm =
+        Character:FindFirstChild("RightHand")
+        or Character:FindFirstChild("Right Arm")
+        or Character:FindFirstChild("RightUpperArm")
+
+    if not RightArm then
+        return
+    end
+
+    CreateFishingLine()
+
+    IsThrowing = true
+
+    -- Điểm cast ban đầu
+    local StartPosition =
+        RightArm.CFrame:PointToWorldSpace(
+            RopePosition
+        )
+
+    local TargetPosition =
+        Mouse.Hit.Position
+
+    -- Giới hạn khoảng cách
+    local Direction =
+        TargetPosition - StartPosition
+
+    local Distance =
+        Direction.Magnitude
+
+    if Distance > RopeLimit then
+        TargetPosition =
+            StartPosition
+            + Direction.Unit * RopeLimit
+    end
+
+    -- Hướng quăng
+    local DirectionToTarget =
+        (TargetPosition - StartPosition).Unit
+
+    local Velocity =
+        DirectionToTarget * ThrowSpeed
+
+    local CurrentPosition =
+        StartPosition
+
+    Hook.Position =
+        CurrentPosition
+
+    -- Raycast
+    local RaycastParams =
+        RaycastParams.new()
+
+    RaycastParams.FilterType =
+        Enum.RaycastFilterType.Exclude
+
+    RaycastParams.FilterDescendantsInstances = {
+        Character,
+        Hook
+    }
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+    end
+
+    PhysicsConnection =
+        RunService.Heartbeat:Connect(function(
+            DeltaTime
+        )
+
+            if not Hook or not Hook.Parent then
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            local PreviousPosition =
+                CurrentPosition
+
+            -- Trọng lực
+            Velocity +=
+                Vector3.new(
+                    0,
+                    -Gravity,
+                    0
+                ) * DeltaTime
+
+            -- Di chuyển móc
+            CurrentPosition +=
+                Velocity * DeltaTime
+
+            -- Raycast
+            local RayDirection =
+                CurrentPosition
+                - PreviousPosition
+
+            local Hit =
+                workspace:Raycast(
+                    PreviousPosition,
+                    RayDirection,
+                    RaycastParams
+                )
+
+            if Hit then
+
+                CurrentPosition =
+                    Hit.Position
+
+                Hook.Position =
+                    CurrentPosition
+
+                IsThrowing = false
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            -- Giới hạn dây
+            local DistanceFromHand =
+                (
+                    CurrentPosition
+                    - StartPosition
+                ).Magnitude
+
+            if DistanceFromHand >= RopeLimit then
+
+                local DirectionFromHand =
+                    (
+                        CurrentPosition
+                        - StartPosition
+                    ).Unit
+
+                CurrentPosition =
+                    StartPosition
+                    + DirectionFromHand
+                    * RopeLimit
+
+                Hook.Position =
+                    CurrentPosition
+
+                IsThrowing = false
+
+                PhysicsConnection:Disconnect()
+                PhysicsConnection = nil
+
+                return
+            end
+
+            Hook.Position =
+                CurrentPosition
+        end)
+end
+
+-- Tạo TNT
+local function CreateTNT(TNTPosition, character, root)
+
+    local TNT = Instance.new("Part")
+    TNT.Name = "TNT"
+    TNT.Size = Vector3.new(4, 4, 4)
+    TNT.Color = Color3.fromRGB(255, 255, 255)
+    TNT.Material = Enum.Material.Neon
+    TNT.Anchored = false
+    TNT.CanCollide = true
+    TNT.Position = TNTPosition
+    TNT.Parent = workspace
+
+    -- Âm thanh xì
+    local TNT_Hiss = Instance.new("Sound")
+    TNT_Hiss.SoundId = "rbxassetid://4633141679"
+    TNT_Hiss.Volume = 1
+    TNT_Hiss.Parent = TNT
+    TNT_Hiss:Play()
+
+    -- Âm thanh nổ
+    local TNT_ExplosionSound = Instance.new("Sound")
+    TNT_ExplosionSound.SoundId = "rbxassetid://112343351840629"
+    TNT_ExplosionSound.Volume = 1
+
+    -- Kết cấu
+    local AroundTexture = Instance.new("Texture")
+    AroundTexture.Texture = "rbxassetid://5522032314"
+    AroundTexture.Face = Enum.NormalId.Front
+    AroundTexture.StudsPerTileU = TNT.Size.X
+    AroundTexture.StudsPerTileV = TNT.Size.Y
+    AroundTexture.Parent = TNT
+
+    local AroundTexture2 = AroundTexture:Clone()
+    AroundTexture2.Face = Enum.NormalId.Back
+    AroundTexture2.Parent = TNT
+
+    local AroundTexture3 = AroundTexture:Clone()
+    AroundTexture3.Face = Enum.NormalId.Left
+    AroundTexture3.StudsPerTileU = TNT.Size.Z
+    AroundTexture3.StudsPerTileV = TNT.Size.Y
+    AroundTexture3.Parent = TNT
+
+    local AroundTexture4 = AroundTexture:Clone()
+    AroundTexture4.Face = Enum.NormalId.Right
+    AroundTexture4.StudsPerTileU = TNT.Size.Z
+    AroundTexture4.StudsPerTileV = TNT.Size.Y
+    AroundTexture4.Parent = TNT
+
+    local TopTexture = Instance.new("Texture")
+    TopTexture.Texture = "rbxassetid://5522034026"
+    TopTexture.Face = Enum.NormalId.Top
+    TopTexture.StudsPerTileU = TNT.Size.X
+    TopTexture.StudsPerTileV = TNT.Size.Z
+    TopTexture.Parent = TNT
+
+    local BottomTexture = Instance.new("Texture")
+    BottomTexture.Texture = "rbxassetid://124194880868071"
+    BottomTexture.Face = Enum.NormalId.Bottom
+    BottomTexture.StudsPerTileU = TNT.Size.X
+    BottomTexture.StudsPerTileV = TNT.Size.Z
+    BottomTexture.Parent = TNT
+
+    -- Nhấp nháy Texture
+    task.spawn(function()
+
+        local StartTime = tick()
+        local TextureVisible = true
+
+        while TNT.Parent and tick() - StartTime < TNT_Time do
+
+            TextureVisible =
+                not TextureVisible
+
+            AroundTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture2.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture3.Transparency =
+                TextureVisible and 0 or 1
+
+            AroundTexture4.Transparency =
+                TextureVisible and 0 or 1
+
+            TopTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            BottomTexture.Transparency =
+                TextureVisible and 0 or 1
+
+            task.wait(TNT_Texture_BlinkTime)
+        end
+    end)
+
+    -- Thời gian nổ
+    task.delay(TNT_Time, function()
+
+        if TNT.Parent then
+
+            local ExplosionSound =
+                TNT_ExplosionSound:Clone()
+
+            ExplosionSound.Parent =
+                SoundService
+
+            ExplosionSound:Play()
+
+            local Explosion =
+                Instance.new("Explosion")
+
+            Explosion.Position =
+                TNT.Position
+
+            Explosion.BlastRadius =
+                0
+
+            Explosion.BlastPressure =
+                0
+
+            Explosion.DestroyJointRadiusPercent =
+                0
+
+            Explosion.Parent =
+                workspace
+
+            -- Fling khi TNT nổ
+            if TNT_Fling_Force > 0
+                and character.Parent
+                and root.Parent then
+
+                local Distance =
+                    (root.Position - TNT.Position).Magnitude
+
+                if Distance <= TNT_Fling_Radius then
+
+                    local Direction =
+                        root.Position - TNT.Position
+
+                    if Direction.Magnitude > 0 then
+
+                        Direction =
+                            Direction.Unit
+
+                        root.AssemblyLinearVelocity =
+                            root.AssemblyLinearVelocity
+                            + Direction * TNT_Fling_Force
+                    end
+                end
+            end
+
+            TNT:Destroy()
+
+            ExplosionSound.Ended:Connect(function()
+                ExplosionSound:Destroy()
+            end)
+        end
+    end)
+end
+
+-- Kích hoạt TNT tại móc câu
+local function ActivateOSC()
+
+    if not Hook or not Hook.Parent then
+        return
+    end
+
+    local Character =
+        player.Character
+
+    if not Character then
+        return
+    end
+
+    local root =
+        Character:FindFirstChild("HumanoidRootPart")
+
+    if not root then
+        return
+    end
+
+    -- Vị trí trung tâm
+    local Center =
+        Hook.Position
+        + Vector3.new(
+            0,
+            Spawn_TNT_Height,
+            0
+        )
+
+    -- TNT ở giữa
+    local Center_Count =
+        TNT_Per_Ring[0] or 0
+
+    if Center_Count > 0 then
+
+        for i = 1, Center_Count do
+
+            CreateTNT(
+                Center,
+                Character,
+                root
+            )
+        end
+    end
+
+    -- Các vòng TNT
+    for Ring = 1, TNT_Max_Ring do
+
+        local TNT_Count =
+            TNT_Per_Ring[Ring] or 0
+
+        -- Chỉ hoạt động khi số TNT lớn hơn 0
+        if TNT_Count > 0 then
+
+            local Radius =
+                Ring * TNT_Ring_Distance
+
+            for i = 1, TNT_Count do
+
+                local Angle =
+                    (i - 1)
+                    * (math.pi * 2 / TNT_Count)
+
+                local X =
+                    math.cos(Angle)
+                    * Radius
+
+                local Z =
+                    math.sin(Angle)
+                    * Radius
+
+                CreateTNT(
+                    Center + Vector3.new(0, 0, 0)
+                    + Vector3.new(X, 0, Z),
+                    Character,
+                    root
+                )
+            end
+        end
+    end
+end
+
+-- Xóa dây câu
+local function RemoveFishingLine()
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+        PhysicsConnection = nil
+    end
+
+    if RopeUpdateConnection then
+        RopeUpdateConnection:Disconnect()
+        RopeUpdateConnection = nil
+    end
+
+    for _, Beam in ipairs(RopeBeams) do
+
+        if Beam then
+            Beam:Destroy()
+        end
+    end
+
+    for _, Node in ipairs(RopeNodes) do
+
+        if Node then
+            Node:Destroy()
+        end
+    end
+
+    table.clear(RopeBeams)
+    table.clear(RopeNodes)
+
+    if Hook then
+        Hook:Destroy()
+        Hook = nil
+    end
+
+    IsThrowing = false
+    OSCActivated = false
+end
+
+-- Tạo Tài nguyên
+local function addAsset()
+
+    local Character =
+        player.Character
+        or player.CharacterAdded:Wait()
+
+    local RightArm =
+        Character:FindFirstChild("RightUpperArm")
+        or Character:FindFirstChild("Right Arm")
+
+    if not RightArm then
+        return
+    end
+
+    local success, accessory =
+        pcall(function()
+
+            return game:GetObjects(
+                "rbxassetid://" .. AssetId
+            )[1]
+        end)
+
+    if not success or not accessory then
+        return
+    end
+
+    local handle =
+        accessory:FindFirstChild("Handle")
+
+    if not handle then
+
+        accessory:Destroy()
+
+        return
+    end
+
+    accessory.Parent =
+        Character
+
+    local weld =
+        Instance.new("Motor6D")
+
+    weld.Part0 =
+        RightArm
+
+    weld.Part1 =
+        handle
+
+    weld.C0 =
+        Position * Rotation
+
+    weld.Parent =
+        handle
+
+    asset =
+        accessory
+end
+
+-- Xóa Tài nguyên
+local function removeAsset()
+
+    if asset then
+
+        asset:Destroy()
+
+        asset = nil
+    end
+end
+
+-- Kết nối Công cụ
+tool.Equipped:Connect(addAsset)
+
+tool.Unequipped:Connect(removeAsset)
+
+tool.Activated:Connect(function()
+
+    -- Bấm lần 1
+    if not Hook or not Hook.Parent then
+
+        OSCActivated = false
+
+        ThrowHook()
+
+        return
+    end
+
+    -- Bấm lần 2
+    if not OSCActivated then
+
+        OSCActivated = true
+
+        ActivateOSC()
+
+        -- Âm thanh Tool bị bể
+        local BreakSound = Instance.new("Sound")
+        BreakSound.SoundId = "rbxassetid://106527737694758"
+        BreakSound.Volume = 1
+        BreakSound.Parent = SoundService
+        BreakSound:Play()
+
+        -- Tool chỉ sử dụng được 1 lần
+        tool:Destroy()
+    end
+end)
+
+tool.Unequipped:Connect(RemoveFishingLine)
+
+
+
+
+
+Trident
+
+
+
+
+
+-- Cây Đinh Ba/Trident
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local Mouse = player:GetMouse()
+
+-- Cài đặt
+local AssetId = "88102388200597"
+local Position = CFrame.new(0, -1, 0)
+local Rotation = CFrame.Angles(0, math.rad(0), 0)
+
+-- Cài đặt
+local ThrowSpeed = 100
+
+-- Cài đặt Loyalty
+local Loyalty = "OFF" -- ON/OFF Loyalty
+local LoyaltySpeed = 35
+local LoyaltyReturnTime = 5
+local LoyaltyRotation = CFrame.Angles(0, math.rad(0), 0)
+
+-- Cài đặt Riptide
+local Riptide = "OFF" -- ON/OFF Riptide
+local RiptideSpeed = 135
+local RiptideSpeedSpin = 0
+local RiptideSpinTime = 0
+
+-- Tạo Công cụ
+local tool = Instance.new("Tool")
+tool.Name = "Trident"
+tool.RequiresHandle = true
+tool.CanBeDropped = false
+
+local Handle = Instance.new("Part")
+Handle.Name = "Handle"
+Handle.Size = Vector3.new(1, 1, 1)
+Handle.Transparency = 1
+Handle.CanCollide = false
+Handle.CanTouch = false
+Handle.CanQuery = false
+Handle.Parent = tool
+
+tool.Parent = player:WaitForChild("Backpack")
+
+local asset
+local PhysicsConnection
+local LoyaltyConnection
+local HasLanded = false
+local HasThrown = false
+
+-- Tạo Tài nguyên
+local function addAsset()
+    local Character = player.Character or player.CharacterAdded:Wait()
+    local RightArm = Character:FindFirstChild("RightUpperArm") or Character:FindFirstChild("Right Arm")
+
+    if not RightArm then
+        return
+    end
+
+    local success, accessory = pcall(function()
+        return game:GetObjects("rbxassetid://" .. AssetId)[1]
+    end)
+
+    if not success or not accessory then
+        return
+    end
+
+    local handle = accessory:FindFirstChild("Handle")
+
+    if not handle then
+        accessory:Destroy()
+        return
+    end
+
+    accessory.Parent = Character
+
+    local weld = Instance.new("Motor6D")
+    weld.Part0 = RightArm
+    weld.Part1 = handle
+    weld.C0 = Position * Rotation
+    weld.Parent = handle
+
+    asset = accessory
+    HasLanded = false
+    HasThrown = false
+end
+
+-- Âm thanh Return random
+local function PlayReturnSound(handle)
+    local ReturnSound1 = "rbxassetid://71198170737336"
+    local ReturnSound2 = "rbxassetid://126489139547936"
+    local ReturnSound3 = "rbxassetid://115425458017096"
+    local ReturnSound = Instance.new("Sound")
+    local RandomNumber = math.random(1, 3)
+
+    if RandomNumber == 1 then
+        ReturnSound.SoundId = ReturnSound1
+    elseif RandomNumber == 2 then
+        ReturnSound.SoundId = ReturnSound2
+    else
+        ReturnSound.SoundId = ReturnSound3
+    end
+
+    ReturnSound.Volume = 1
+    ReturnSound.Parent = handle
+    ReturnSound:Play()
+
+    ReturnSound.Ended:Connect(function()
+        if ReturnSound then
+            ReturnSound:Destroy()
+        end
+    end)
+end
+
+-- Loyalty bay về người chơi
+local function ReturnTrident()
+    if not asset then
+        return
+    end
+
+    if not HasLanded then
+        return
+    end
+
+    if asset.Parent ~= workspace then
+        return
+    end
+
+    local Character = player.Character
+
+    if not Character then
+        return
+    end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+    if not RootPart then
+        return
+    end
+
+    local handle = asset:FindFirstChild("Handle")
+
+    if not handle then
+        return
+    end
+
+    if LoyaltyConnection then
+        LoyaltyConnection:Disconnect()
+        LoyaltyConnection = nil
+    end
+
+    -- Sound phát đúng lúc bắt đầu Return
+    PlayReturnSound(handle)
+
+    HasLanded = false
+
+    handle.Anchored = true
+    handle.CanCollide = false
+    handle.CanTouch = false
+    handle.CanQuery = false
+
+    LoyaltyConnection = RunService.Heartbeat:Connect(function(DeltaTime)
+        if not handle or not handle.Parent then
+            LoyaltyConnection:Disconnect()
+            LoyaltyConnection = nil
+            return
+        end
+
+        local CurrentCharacter = player.Character
+
+        if not CurrentCharacter then
+            return
+        end
+
+        local CurrentRoot = CurrentCharacter:FindFirstChild("HumanoidRootPart")
+
+        if not CurrentRoot then
+            return
+        end
+
+        local TargetPosition = CurrentRoot.Position
+        local Difference = TargetPosition - handle.Position
+        local Distance = Difference.Magnitude
+
+        -- Đã bay tới người chơi
+        if Distance <= 3 then
+            LoyaltyConnection:Disconnect()
+            LoyaltyConnection = nil
+
+            asset:Destroy()
+            asset = nil
+
+            HasThrown = false
+            HasLanded = false
+
+            -- Trả Tool về Backpack
+            tool.Parent = player:WaitForChild("Backpack")
+
+            return
+        end
+
+        local ReturnDirection = Difference.Unit
+        local NewPosition = handle.Position + ReturnDirection * LoyaltySpeed * DeltaTime
+
+        handle.CFrame = CFrame.lookAt(NewPosition, NewPosition + ReturnDirection) * LoyaltyRotation
+    end)
+end
+
+-- Riptide phóng nhân vật về vị trí đã bấm
+local function RiptideTrident()
+    local Character = player.Character
+
+    if not Character then
+        return
+    end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+    if not RootPart then
+        return
+    end
+
+    local TargetPosition = Mouse.Hit.Position
+    local Difference = TargetPosition - RootPart.Position
+
+    if Difference.Magnitude <= 0 then
+        return
+    end
+
+    local Direction = Difference.Unit
+
+    -- Âm thanh Riptide random
+    local RiptideSound1 = "rbxassetid://137007036913527"
+    local RiptideSound2 = "rbxassetid://140096522484381"
+    local RiptideSound = Instance.new("Sound")
+
+    if math.random(1, 2) == 1 then
+        RiptideSound.SoundId = RiptideSound1
+    else
+        RiptideSound.SoundId = RiptideSound2
+    end
+
+    RiptideSound.Volume = 1
+    RiptideSound.Parent = RootPart
+    RiptideSound:Play()
+
+    RiptideSound.Ended:Connect(function()
+        RiptideSound:Destroy()
+    end)
+
+    RootPart.AssemblyLinearVelocity = Direction * RiptideSpeed
+
+    -- Riptide Spin
+    for _, Object in pairs(RootPart:GetChildren()) do
+        if Object.Name == "Spinning" then
+            Object:Destroy()
+        end
+    end
+
+    if RiptideSpeedSpin ~= 0 and RiptideSpinTime > 0 then
+        local Spin = Instance.new("BodyAngularVelocity")
+        Spin.Name = "Spinning"
+        Spin.Parent = RootPart
+        Spin.MaxTorque = Vector3.new(0, math.huge, 0)
+        Spin.AngularVelocity = Vector3.new(0, RiptideSpeedSpin, 0)
+
+        task.delay(RiptideSpinTime, function()
+            if Spin and Spin.Parent == RootPart then
+                Spin:Destroy()
+            end
+        end)
+    end
+end
+
+-- Phóng Trident
+local function ThrowTrident()
+    if not asset then
+        return
+    end
+
+    if HasLanded then
+        return
+    end
+
+    local Character = player.Character
+
+    if not Character then
+        return
+    end
+
+    local RightArm = Character:FindFirstChild("RightUpperArm") or Character:FindFirstChild("Right Arm")
+
+    if not RightArm then
+        return
+    end
+
+    local handle = asset:FindFirstChild("Handle")
+
+    if not handle then
+        return
+    end
+
+    local Direction = Mouse.Hit.Position - handle.Position
+
+    if Direction.Magnitude <= 0 then
+        return
+    end
+
+    Direction = Direction.Unit
+
+    -- Âm thanh phóng random
+    local ThrowSound1 = "rbxassetid://127288802636114"
+    local ThrowSound2 = "rbxassetid://132224047607007"
+    local ThrowSound = Instance.new("Sound")
+
+    if math.random(1, 2) == 1 then
+        ThrowSound.SoundId = ThrowSound1
+    else
+        ThrowSound.SoundId = ThrowSound2
+    end
+
+    ThrowSound.Volume = 1
+    ThrowSound.Parent = handle
+    ThrowSound:Play()
+
+    ThrowSound.Ended:Connect(function()
+        ThrowSound:Destroy()
+    end)
+
+    -- Tách Trident khỏi tay
+    for _, Object in ipairs(handle:GetChildren()) do
+        if Object:IsA("Motor6D") then
+            Object:Destroy()
+        end
+    end
+
+    asset.Parent = workspace
+    HasThrown = true
+
+    handle.Anchored = true
+    handle.CanCollide = false
+    handle.CanTouch = false
+    handle.CanQuery = false
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+        PhysicsConnection = nil
+    end
+
+    local CurrentPosition = handle.Position
+    local Velocity = Direction * ThrowSpeed
+
+    local RaycastParams = RaycastParams.new()
+    RaycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    RaycastParams.FilterDescendantsInstances = {
+        Character,
+        asset
+    }
+
+    PhysicsConnection = RunService.Heartbeat:Connect(function(DeltaTime)
+        if not handle or not handle.Parent then
+            PhysicsConnection:Disconnect()
+            PhysicsConnection = nil
+            return
+        end
+
+        local PreviousPosition = CurrentPosition
+
+        -- Trọng lực
+        Velocity += Vector3.new(0, -workspace.Gravity, 0) * DeltaTime
+
+        local NewPosition = CurrentPosition + Velocity * DeltaTime
+        local RayDirection = NewPosition - PreviousPosition
+
+        local Result = workspace:Raycast(PreviousPosition, RayDirection, RaycastParams)
+
+        if Result then
+            CurrentPosition = Result.Position
+
+            local ImpactDirection = Velocity
+
+            if ImpactDirection.Magnitude > 0 then
+                ImpactDirection = ImpactDirection.Unit
+            else
+                ImpactDirection = Direction
+            end
+
+            handle.CFrame = CFrame.lookAt(CurrentPosition, CurrentPosition + ImpactDirection)
+
+            -- Kiểm tra Player / NPC
+            local HitCharacter = Result.Instance:FindFirstAncestorOfClass("Model")
+            local HitPlayer = HitCharacter and Players:GetPlayerFromCharacter(HitCharacter)
+            local HitHumanoid = HitCharacter and HitCharacter:FindFirstChildOfClass("Humanoid")
+
+            if HitPlayer or HitHumanoid then
+                -- Pierce Sound
+                local Pierce1 = "rbxassetid://128968057279479"
+                local Pierce2 = "rbxassetid://86338171355237"
+                local PierceSound = Instance.new("Sound")
+
+                if math.random(1, 2) == 1 then
+                    PierceSound.SoundId = Pierce1
+                else
+                    PierceSound.SoundId = Pierce2
+                end
+
+                PierceSound.Volume = 1
+                PierceSound.Parent = handle
+                PierceSound:Play()
+
+                PierceSound.Ended:Connect(function()
+                    PierceSound:Destroy()
+                end)
+
+                RaycastParams.FilterDescendantsInstances = {
+                    Character,
+                    asset,
+                    HitCharacter
+                }
+
+                -- Văng ngược
+                local BackDirection = -ImpactDirection
+
+                local RandomOffset = Vector3.new(
+                    math.random(-35, 35) / 100,
+                    math.random(-15, 20) / 100,
+                    math.random(-35, 35) / 100
+                )
+
+                local BounceDirection = (BackDirection + RandomOffset).Unit
+
+                Velocity = BounceDirection * ThrowSpeed
+                CurrentPosition = CurrentPosition + BounceDirection * 0.2
+
+                handle.CFrame = CFrame.lookAt(
+                    CurrentPosition,
+                    CurrentPosition + BounceDirection
+                )
+
+                return
+            end
+
+            -- Impact Sound
+            local ImpactSound1 = "rbxassetid://93112074394408"
+            local ImpactSound2 = "rbxassetid://122893311840943"
+            local ImpactSound = Instance.new("Sound")
+
+            if math.random(1, 2) == 1 then
+                ImpactSound.SoundId = ImpactSound1
+            else
+                ImpactSound.SoundId = ImpactSound2
+            end
+
+            ImpactSound.Volume = 1
+            ImpactSound.Parent = handle
+            ImpactSound:Play()
+
+            ImpactSound.Ended:Connect(function()
+                ImpactSound:Destroy()
+            end)
+
+            -- Dừng và cắm Trident
+            Velocity = Vector3.zero
+
+            handle.Anchored = true
+            handle.CanCollide = true
+            handle.CanTouch = true
+            handle.CanQuery = true
+
+            HasLanded = true
+
+            PhysicsConnection:Disconnect()
+            PhysicsConnection = nil
+
+            -- Loyalty
+            if string.upper(tostring(Loyalty)) == "ON" then
+                if LoyaltyReturnTime > 0 then
+                    task.delay(LoyaltyReturnTime, function()
+                        if asset and asset.Parent == workspace and HasLanded then
+                            ReturnTrident()
+                        end
+                    end)
+                else
+                    -- Time = 0
+                    -- Return ngay
+                    ReturnTrident()
+                end
+            end
+
+            return
+        end
+
+        CurrentPosition = NewPosition
+
+        if Velocity.Magnitude > 0 then
+            handle.CFrame = CFrame.lookAt(
+                CurrentPosition,
+                CurrentPosition + Velocity.Unit
+            )
+        else
+            handle.Position = CurrentPosition
+        end
+    end)
+
+    -- Xóa Tool khỏi Backpack
+    tool.Parent = nil
+end
+
+-- Nhặt lại Trident bằng click
+local function PickupTrident()
+    if not asset then
+        return
+    end
+
+    if not HasLanded then
+        return
+    end
+
+    if asset.Parent ~= workspace then
+        return
+    end
+
+    local handle = asset:FindFirstChild("Handle")
+
+    if not handle then
+        return
+    end
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+        PhysicsConnection = nil
+    end
+
+    if LoyaltyConnection then
+        LoyaltyConnection:Disconnect()
+        LoyaltyConnection = nil
+    end
+
+    asset:Destroy()
+    asset = nil
+
+    HasLanded = false
+    HasThrown = false
+
+    -- Chỉ đưa Tool về Backpack
+    tool.Parent = player:WaitForChild("Backpack")
+end
+
+-- Click để nhặt Trident
+Mouse.Button1Down:Connect(function()
+    if not asset then
+        return
+    end
+
+    if not HasLanded then
+        return
+    end
+
+    if asset.Parent ~= workspace then
+        return
+    end
+
+    local Target = Mouse.Target
+
+    if Target and Target:IsDescendantOf(asset) then
+        PickupTrident()
+    end
+end)
+
+-- Xóa Tài nguyên
+local function removeAsset()
+    if HasThrown then
+        return
+    end
+
+    if PhysicsConnection then
+        PhysicsConnection:Disconnect()
+        PhysicsConnection = nil
+    end
+
+    if LoyaltyConnection then
+        LoyaltyConnection:Disconnect()
+        LoyaltyConnection = nil
+    end
+
+    if asset then
+        asset:Destroy()
+        asset = nil
+    end
+
+    HasLanded = false
+end
+
+-- Kích hoạt Trident
+local function ActivateTrident()
+    if string.upper(tostring(Riptide)) == "ON" then
+        RiptideTrident()
+    else
+        ThrowTrident()
+    end
+end
+
+-- Kết nối Công cụ
+tool.Equipped:Connect(addAsset)
+tool.Unequipped:Connect(removeAsset)
+
+tool.Activated:Connect(function()
+    ActivateTrident()
+end)
