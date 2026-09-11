@@ -358,8 +358,8 @@ local Mouse = player:GetMouse()
 
 -- Tài nguyên
 local AssetId = "121035700898871" -- ID tài nguyên
-local Position = CFrame.new(0, -1.3, -1) -- Vị trí
-local Rotation = CFrame.Angles(0, math.rad(-90), 20) -- Xoay
+local Position = CFrame.new(0, -1.7, -0.8) -- Vị trí
+local Rotation = CFrame.Angles(math.rad(-90), math.rad(-90), math.rad(0)) -- Xoay
 
 -- Cài đặt dây câu
 local RopeLimit = 32 -- Giới hạn dây
@@ -1162,8 +1162,8 @@ local Mouse = player:GetMouse()
 
 -- Tài nguyên
 local AssetId = "121035700898871" -- ID tài nguyên
-local Position = CFrame.new(0, -1.3, -1) -- Vị trí
-local Rotation = CFrame.Angles(0, math.rad(-90), 20) -- Xoay
+local Position = CFrame.new(0, -1.7, -0.8) -- Vị trí
+local Rotation = CFrame.Angles(math.rad(-90), math.rad(-90), math.rad(0)) -- Xoay
 
 -- Cài đặt dây câu
 local RopeLimit = 32 -- Giới hạn dây
@@ -1982,7 +1982,7 @@ local Mouse = player:GetMouse()
 -- Cài đặt
 local AssetId = "88102388200597"
 local Position = CFrame.new(0, -1, 0)
-local Rotation = CFrame.Angles(0, math.rad(0), 0)
+local Rotation = CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
 
 -- Cài đặt
 local ThrowSpeed = 100     -- Tốc độ Ném
@@ -1991,7 +1991,7 @@ local ThrowSpeed = 100     -- Tốc độ Ném
 local Loyalty = "OFF"     -- ON/OFF Loyalty
 local LoyaltySpeed = 55     -- Tốc độ Loyalty
 local LoyaltyReturnTime = 5     -- Thời gian chờ Loyalty quay về
-local LoyaltyRotation = CFrame.Angles(0, math.rad(0), 0)     -- Gốc xoay Loyalty
+local LoyaltyRotation = CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))     -- Gốc xoay Loyalty
 
 -- Cài đặt Riptide
 local Riptide = "OFF"     -- ON/OFF Riptide
@@ -2594,4 +2594,251 @@ tool.Unequipped:Connect(removeAsset)
 
 tool.Activated:Connect(function()
     ActivateTrident()
+end)
+
+
+
+
+
+Spear
+
+
+
+
+
+-- Cây Giáo/Spear
+
+
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Người chơi
+local player = Players.LocalPlayer
+local Mouse = player:GetMouse()
+
+-- Cài đặt Tài nguyên
+local AssetId = "77798357691864"
+local Position = CFrame.new(0, -1, 0)
+local Rotation = CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+
+-- Cài đặt Lunge
+local LungeSpeed = 160     -- Tốc độ Lunge
+local LungeCooldown = 1.15     -- Thời gian hồi Lunge
+local LungeRotationTime = 1     -- Thời gian xoay Lunge
+local LungeRotation = CFrame.Angles(math.rad(-90), math.rad(0), math.rad(90))     -- Gốc xoay Lunge
+
+-- Tạo Công cụ
+local tool = Instance.new("Tool")
+tool.Name = "Spear"
+tool.RequiresHandle = true
+tool.CanBeDropped = false
+
+local Handle = Instance.new("Part")
+Handle.Name = "Handle"
+Handle.Size = Vector3.new(1, 1, 1)
+Handle.Transparency = 1
+Handle.CanCollide = false
+Handle.CanTouch = false
+Handle.CanQuery = false
+Handle.Parent = tool
+
+tool.Parent = player:WaitForChild("Backpack")
+
+local asset
+local AssetWeld
+local LungeCooldownActive = false
+
+-- Tạo Tài nguyên
+local function addAsset()
+    local Character = player.Character or player.CharacterAdded:Wait()
+    local RightArm = Character:FindFirstChild("RightUpperArm") or Character:FindFirstChild("Right Arm")
+
+    if not RightArm then
+        return
+    end
+
+    local success, accessory = pcall(function()
+        return game:GetObjects("rbxassetid://" .. AssetId)[1]
+    end)
+
+    if not success or not accessory then
+        return
+    end
+
+    local handle = accessory:FindFirstChild("Handle")
+
+    if not handle then
+        accessory:Destroy()
+        return
+    end
+
+    accessory.Parent = Character
+
+    local weld = Instance.new("Motor6D")
+    weld.Part0 = RightArm
+    weld.Part1 = handle
+    weld.C0 = Position * Rotation
+    weld.Parent = handle
+
+    AssetWeld = weld
+    asset = accessory
+end
+
+-- Lunge / Dash
+local function Spear()
+    if LungeCooldown > 0 then
+        if LungeCooldownActive then
+            return
+        end
+
+        LungeCooldownActive = true
+
+        task.delay(LungeCooldown, function()
+            LungeCooldownActive = false
+        end)
+    end
+
+    local Character = player.Character
+
+    if not Character then
+        return
+    end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+    if not RootPart then
+        return
+    end
+
+    local LookDirection = RootPart.CFrame.LookVector
+
+    local Direction = Vector3.new(
+        LookDirection.X,
+        0,
+        LookDirection.Z
+    )
+
+    if Direction.Magnitude <= 0 then
+        return
+    end
+
+    Direction = Direction.Unit
+
+    -- Âm thanh Lunge random
+    local LungeSound1 = "rbxassetid://110251799268921"
+    local LungeSound2 = "rbxassetid://107348852512894"
+    local LungeSound3 = "rbxassetid://81101114939496"
+    local LungeSound = Instance.new("Sound")
+
+    local RandomNumber = math.random(1, 3)
+
+    if RandomNumber == 1 then
+        LungeSound.SoundId = LungeSound1
+    elseif RandomNumber == 2 then
+        LungeSound.SoundId = LungeSound2
+    else
+        LungeSound.SoundId = LungeSound3
+    end
+
+    LungeSound.Volume = 1
+    LungeSound.Parent = RootPart
+    LungeSound:Play()
+
+    LungeSound.Ended:Connect(function()
+        LungeSound:Destroy()
+    end)
+
+    -- Lunge Hit Sound
+    local HitConnection
+    local HasHit = false
+
+    HitConnection = RootPart.Touched:Connect(function(Hit)
+        if HasHit then
+            return
+        end
+
+        local HitCharacter = Hit:FindFirstAncestorOfClass("Model")
+
+        if not HitCharacter or HitCharacter == Character then
+            return
+        end
+
+        local HitPlayer = Players:GetPlayerFromCharacter(HitCharacter)
+        local HitHumanoid = HitCharacter:FindFirstChildOfClass("Humanoid")
+
+        if HitPlayer or HitHumanoid then
+            HasHit = true
+
+            -- Dừng Lunge khi trúng Player / NPC
+            RootPart.AssemblyLinearVelocity = Vector3.zero
+
+            -- Âm thanh Lunge Hit random
+            local LungeHitSound1 = "rbxassetid://91465940329299"
+            local LungeHitSound2 = "rbxassetid://120789254983908"
+            local LungeHitSound3 = "rbxassetid://90864194032783"
+            local LungeHitSound = Instance.new("Sound")
+
+            local RandomHitNumber = math.random(1, 3)
+
+            if RandomHitNumber == 1 then
+                LungeHitSound.SoundId = LungeHitSound1
+            elseif RandomHitNumber == 2 then
+                LungeHitSound.SoundId = LungeHitSound2
+            else
+                LungeHitSound.SoundId = LungeHitSound3
+            end
+
+            LungeHitSound.Volume = 1
+            LungeHitSound.Parent = RootPart
+            LungeHitSound:Play()
+
+            LungeHitSound.Ended:Connect(function()
+                LungeHitSound:Destroy()
+            end)
+
+            if HitConnection then
+                HitConnection:Disconnect()
+                HitConnection = nil
+            end
+        end
+    end)
+
+    RootPart.AssemblyLinearVelocity = Direction * LungeSpeed
+
+    -- Xoay riêng Asset, không xoay nhân vật
+    if AssetWeld and AssetWeld.Parent then
+        AssetWeld.C0 = Position * LungeRotation
+
+        task.delay(LungeRotationTime, function()
+            if AssetWeld and AssetWeld.Parent then
+                AssetWeld.C0 = Position * Rotation
+            end
+        end)
+    end
+
+    task.delay(0.5, function()
+        if HitConnection then
+            HitConnection:Disconnect()
+            HitConnection = nil
+        end
+    end)
+end
+
+-- Xóa Tài nguyên
+local function removeAsset()
+    if asset then
+        asset:Destroy()
+        asset = nil
+        AssetWeld = nil
+    end
+end
+
+-- Kết nối Công cụ
+tool.Equipped:Connect(addAsset)
+tool.Unequipped:Connect(removeAsset)
+
+tool.Activated:Connect(function()
+    Spear()
 end)
